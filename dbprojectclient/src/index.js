@@ -35,7 +35,7 @@ function Register() {
     }).then(val => val.json())
       .then(json => {
         if (json.error === "none") {
-          nav("/login");
+         nav("/login");
         }
       });
   };
@@ -95,6 +95,18 @@ function Register() {
 
           <input type="submit" value="Register" />
         </form>
+
+        <p className="login-link-text">
+  Already have an account?
+</p>
+<button
+  className="login-link-btn"
+  onClick={() => nav("/login")}
+>
+  Log in here
+</button>
+
+
       </div>
     </div>
   );
@@ -159,7 +171,7 @@ function Login() {
             value={cred.username}
             onChange={handleChange}
           />
-
+  
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -168,12 +180,23 @@ function Login() {
             value={cred.password}
             onChange={handleChange}
           />
-
+  
           <input type="submit" value="Login" />
         </form>
+  
+        <p className="register-link-text">
+          Don’t have an account?
+        </p>
+        <button
+          className="register-link-btn"
+          onClick={() => nav("/register")}
+        >
+          Register Here
+        </button>
       </div>
     </div>
   );
+  
 
 }
 
@@ -196,7 +219,7 @@ function Dashboard() {
     if (localStorage.getItem("loggedIn") === "true") {
       setLoggedIn(true);
     } else {
-      nav("/login");
+     nav("/login");
     }
 
     fetch('/api/getRSOs', {
@@ -223,22 +246,41 @@ function Dashboard() {
   };
 
   return (
-    <>
-      <h2>Create an RSO</h2>
-      {role === "admin" && <AdminDashboard />}
-      <h2>Join an RSO</h2>
-      <form onSubmit={joinRSO}>
-        <select value={selectedJoinRSO} onChange={handleChange}>
-          {
-            RSOs.map((value, idx) => (
-              <option key={idx} value={value.RSO_ID}>{value.Name}</option>
-            ))
-          }
-        </select>
-        <input type="submit" value="Join" />
-      </form>
-    </>
+    <div className="dashboard-container">
+      <div className="dashboard-box">
+        <h1>Welcome, {firstName || "Guest"} 👋</h1>
+        <p className="role-text">Role: {role || "visitor"}</p>
+  
+        {role === "admin" && (
+          <>
+            <h2>Create an RSO</h2>
+            <AdminDashboard />
+          </>
+        )}
+  
+        <h2>Join an RSO</h2>
+        {loggedIn ? (
+          <form onSubmit={joinRSO} className="dashboard-form">
+            <select value={selectedJoinRSO} onChange={handleChange}>
+              {RSOs.map((value, idx) => (
+                <option key={idx} value={value.RSO_ID}>{value.Name}</option>
+              ))}
+            </select>
+            <input type="submit" value="Join" />
+          </form>
+        ) : (
+          <button
+            className="login-join-btn"
+            onClick={() => nav("/login")}
+          >
+            Log in to join RSOs
+          </button>
+        )}
+      </div>
+    </div>
   );
+  
+  
 }
 
 function SuperAdminDashboard() {
@@ -282,34 +324,48 @@ function AdminDashboard() {
   };
 
   return (
-    <>
-      <form onSubmit={handleCreateRSO}>
-        <label for="name">Name</label>
-        <input type="text" name="name" id="name" onChange={handleChange} /><br />
-        <label for="description">Description</label>
-        <input type="text" name="description" id="description" onChange={handleChange} /><br />
-        <label for="adminEmail">Admin Email</label>
-        <input type="text" name="adminEmail" id="adminEmail" onChange={handleChange} /><br />
-        <label for="member1">Member 1</label>
-        <input type="text" name="member1" id="member1" onChange={handleChange} /><br />
-        <label for="member2">Member 2</label>
-        <input type="text" name="member2" id="member2" onChange={handleChange} /><br />
-        <label for="member3">Member 3</label>
-        <input type="text" name="member3" id="member3" onChange={handleChange} /><br />
-        <label for="member4">Member 4</label>
-        <input type="text" name="member4" id="member4" onChange={handleChange} /><br />
-        <label for="uni">University</label>
-        <select name="uni" id="uni" onChange={handleChange}>
-          {
-            unis.map((item, index) => (
+    <div className="admin-dashboard">
+      <form onSubmit={handleCreateRSO} className="admin-form">
+        <h3>Create a New RSO</h3>
+  
+        <div className="form-group">
+          <label htmlFor="name">RSO Name</label>
+          <input type="text" name="name" id="name" onChange={handleChange} />
+        </div>
+  
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
+          <input type="text" name="description" id="description" onChange={handleChange} />
+        </div>
+  
+        <div className="form-group">
+          <label htmlFor="adminEmail">Admin Email</label>
+          <input type="text" name="adminEmail" id="adminEmail" onChange={handleChange} />
+        </div>
+  
+        <h4>Members</h4>
+        <div className="form-grid">
+          <input type="text" name="member1" placeholder="Member 1" onChange={handleChange} />
+          <input type="text" name="member2" placeholder="Member 2" onChange={handleChange} />
+          <input type="text" name="member3" placeholder="Member 3" onChange={handleChange} />
+          <input type="text" name="member4" placeholder="Member 4" onChange={handleChange} />
+        </div>
+  
+        <div className="form-group">
+          <label htmlFor="uni">University</label>
+          <select name="uni" id="uni" onChange={handleChange}>
+            <option value="">Select a university</option>
+            {unis.map((item, index) => (
               <option key={index} value={item.Name}>{item.Name}</option>
-            ))
-          }
-        </select> <br />
-        <input type="submit" value="Create RSO" />
+            ))}
+          </select>
+        </div>
+  
+        <input type="submit" value="Create RSO" className="admin-submit" />
       </form>
-    </>
+    </div>
   );
+  
 }
 
 let router = createBrowserRouter([
@@ -330,6 +386,8 @@ let router = createBrowserRouter([
     Component: Login
   }
 ]);
+
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

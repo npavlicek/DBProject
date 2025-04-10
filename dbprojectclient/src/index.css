@@ -50,7 +50,7 @@ code {
 
 .login-box input[type="text"],
 .login-box input[type="password"] {
-  width: 100%;
+  width: 92%;
   padding: 0.65rem;
   font-size: 0.95rem;
   margin-bottom: 1.2rem;
@@ -158,4 +158,221 @@ code {
 
 .register-box input[type="submit"]:hover {
   background-color:  rgb(214, 169, 146);
+}
+
+/* Dashboard Styling */
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  animation: fadeIn 0.5s ease;
+}
+
+.dashboard-box {
+  background-color: rgba(255, 255, 255, 0.92);
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.dashboard-box h1 {
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.role-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-box h2 {
+  color: #444;
+  margin-top: 2rem;
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.dashboard-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dashboard-form select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.dashboard-form input[type="submit"] {
+  background-color: rgb(245,207,188);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-form input[type="submit"]:hover {
+  background-color: rgb(214, 169, 146);
+}
+
+.login-warning {
+  color: #cc4b4b;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+/* Admin Dashboard Styling */
+.admin-dashboard {
+  margin-top: 2rem;
+  background-color: rgba(255, 255, 255, 0.92);
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.admin-form h3 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.admin-form h4 {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-group label {
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: rgb(245, 207, 188);
+  outline: none;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.admin-submit {
+  margin-top: 1.2rem;
+  background-color: rgb(245,207,188);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.admin-submit:hover {
+  background-color: rgb(214, 169, 146);
+}
+.login-join-btn {
+  margin-top: 1rem;
+  background-color: rgb(245, 207, 188);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.login-join-btn:hover {
+  background-color: rgb(214, 169, 146);
+}
+.register-link-text {
+  margin-top: 1.2rem;
+  font-size: 0.95rem;
+  color: #444;
+  text-align: center;
+}
+
+.register-link-btn {
+  margin-top: 0.5rem;
+  background-color: transparent;
+  color: rgb(245, 151, 123);
+  border: 2px solid rgb(245, 151, 123);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.register-link-btn:hover {
+  background-color: rgb(245, 151, 123);
+  color: white;
+}
+
+.login-link-text {
+  margin-top: 1.2rem;
+  font-size: 0.95rem;
+  color: #444;
+  text-align: center;
+}
+
+.login-link-btn {
+  margin-top: 0.5rem;
+  background-color: transparent;
+  color: rgb(245, 151, 123);
+  border: 2px solid rgb(245, 151, 123);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.login-link-btn:hover {
+  background-color: rgb(245, 151, 123);
+  color: white;
 }
