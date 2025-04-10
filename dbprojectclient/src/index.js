@@ -133,9 +133,9 @@ function Dashboard() {
   const [lastName, setLastName] = useState(localStorage.getItem("lastName"));
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState(localStorage.getItem("role"));
+  const [RSOs, setRSOs] = useState([]);
 
   const nav = useNavigate();
-
 
   useEffect(() => {
     if (localStorage.getItem("loggedIn") === "true") {
@@ -143,14 +143,29 @@ function Dashboard() {
     } else {
       nav("/login");
     }
+
+    fetch('/api/getRSOs', {
+      method: 'get'
+    }).then(data => { return data.json() }).then(json => {
+      setRSOs(json.rsos);
+    });
+
   }, []);
 
   return (
     <>
-      <p>{firstName}</p>
-      <p>{lastName}</p>
-      <p>{loggedIn}</p>
-      <p>{role}</p>
+      {role === "admin" && <AdminDashboard />}
+      <h2>Join an RSO</h2>
+      <form>
+        <select>
+          {
+            RSOs.map((value, idx) => (
+              <option key={idx} value={value.RSO_ID}>{value.Name}</option>
+            ))
+          }
+        </select>
+        <input type="submit" value="Join" />
+      </form>
     </>
   );
 }
@@ -160,11 +175,70 @@ function SuperAdminDashboard() {
 }
 
 function AdminDashboard() {
-  const [RSO, setRSO] = useState(false);
+  const [RSOs, setRSOs] = useState([]);
+  const [unis, setUnis] = useState([]);
+  const [RSOData, setRSOData] = useState({});
 
-  return RSO ? (
-    <>{RSO && <h1>RSO</h1>}</>
-  ) : (<></>);
+  useEffect(() => {
+    fetch("/api/getUniversities", {
+      method: "get",
+    }).then(data => {
+      return data.json();
+    }).then(json => {
+      setUnis(json.unis);
+      console.log(json.unis);
+    });
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setRSOData({
+      ...RSOData,
+      [name]: value
+    });
+  };
+
+  const handleCreateRSO = (e) => {
+    e.preventDefault();
+
+    fetch("/api/createRSO", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(RSOData)
+    });
+  };
+
+  return (
+    <>
+      <form onSubmit={handleCreateRSO}>
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" onChange={handleChange} /><br />
+        <label for="description">Description</label>
+        <input type="text" name="description" id="description" onChange={handleChange} /><br />
+        <label for="adminEmail">Admin Email</label>
+        <input type="text" name="adminEmail" id="adminEmail" onChange={handleChange} /><br />
+        <label for="member1">Member 1</label>
+        <input type="text" name="member1" id="member1" onChange={handleChange} /><br />
+        <label for="member2">Member 2</label>
+        <input type="text" name="member2" id="member2" onChange={handleChange} /><br />
+        <label for="member3">Member 3</label>
+        <input type="text" name="member3" id="member3" onChange={handleChange} /><br />
+        <label for="member4">Member 4</label>
+        <input type="text" name="member4" id="member4" onChange={handleChange} /><br />
+        <label for="uni">University</label>
+        <select name="uni" id="uni" onChange={handleChange}>
+          {
+            unis.map((item, index) => (
+              <option key={index} value={item.Name}>{item.Name}</option>
+            ))
+          }
+        </select> <br />
+        <input type="submit" value="Create RSO" />
+      </form>
+    </>
+  );
 }
 
 let router = createBrowserRouter([
