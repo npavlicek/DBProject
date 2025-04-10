@@ -32,43 +32,76 @@ function Register() {
       },
       method: "post",
       body: JSON.stringify(formData)
-    }).then(val => {
-      return val.json();
-    }).then(json => {
-      if (json.error === "none") {
-        nav("/login");
-      }
-    });
+    }).then(val => val.json())
+      .then(json => {
+        if (json.error === "none") {
+          nav("/login");
+        }
+      });
   };
 
   return (
-    <>
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <label for="firstName">First Name</label>
-        <input type="text" name="firstName" value={formData.firstName} id="firstName" onChange={handleChange} /><br />
-        <label for="lastName">Last Name</label>
-        <input type="text" name="lastName" value={formData.lastName} id="lastName" onChange={handleChange} /><br />
-        <label for="username">Username</label>
-        <input type="text" name="username" value={formData.username} id="username" onChange={handleChange} /><br />
-        <label for="password">Password</label>
-        <input type="password" name="password" value={formData.password} id="password" onChange={handleChange} /><br />
-        <label for="role">Role</label>
-        <select
-          id="role"
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-        >
-          <option value="student">Student</option>
-          <option value="admin">Admin</option>
-          <option value="superadmin">Super Admin</option>
-        </select><br />
-        <input type="submit" value="Register" />
-      </form>
-    </>
+    <div className="register-container">
+      <div className="register-box">
+        <h1>Register</h1>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="firstName">First Name</label>
+          <input
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            id="firstName"
+            onChange={handleChange}
+          />
+  
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            id="lastName"
+            onChange={handleChange}
+          />
+  
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            name="username"
+            value={formData.username}
+            id="username"
+            onChange={handleChange}
+          />
+  
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            id="password"
+            onChange={handleChange}
+          />
+  
+          <label htmlFor="role">Role</label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            style={{ marginBottom: '1.2rem', padding: '0.65rem', borderRadius: '6px', border: '1px solid #ccc' }}
+          >
+            <option value="student">Student</option>
+            <option value="admin">Admin</option>
+            <option value="superadmin">Super Admin</option>
+          </select>
+  
+          <input type="submit" value="Register" />
+        </form>
+      </div>
+    </div>
   );
+  
 }
+
 
 function Login() {
   const [cred, setCred] = useState({
@@ -115,17 +148,34 @@ function Login() {
   };
 
   return (
-    <>
-      <h1>Log In</h1>
-      <form onSubmit={submit}>
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username" value={cred.username} onChange={handleChange} /> <br />
-        <label for="password">Password</label>
-        <input type="password" name="password" id="password" value={cred.password} onChange={handleChange} /> <br />
-        <input type="submit" value="Login" />
-      </form>
-    </>
+    <div className="login-container">
+      <div className="login-box">
+        <h1>Log In</h1>
+        <form onSubmit={submit}>
+          <label htmlFor="username">Email</label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            value={cred.username}
+            onChange={handleChange}
+          />
+  
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            value={cred.password}
+            onChange={handleChange}
+          />
+  
+          <input type="submit" value="Login" />
+        </form>
+      </div>
+    </div>
   );
+  
 }
 
 function Dashboard() {
@@ -271,3 +321,4 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
