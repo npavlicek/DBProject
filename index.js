@@ -116,11 +116,11 @@ app.get("/api/getRSOs", async (req, res) => {
 });
 
 app.post("/api/joinRSO", async (req, res) => {
-	// FIXME:
+	console.log(req.body);
 	let response = { error: "none" };
 	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
 	try {
-		const res = await db.query("INSERT INTO RSO (Admins_ID, Name, Description) VALUES (?, ?, ?)", [req.session.uid, req.body.name, req.body.description]);
+		await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [req.session.uid, req.body.rsoID]);
 	} catch (e) {
 		response.error = "fatal";
 		console.error(e);
@@ -132,31 +132,34 @@ app.post("/api/joinRSO", async (req, res) => {
 });
 
 app.post("/api/createRSO", async (req, res) => {
-	// TODO: add teammates INTO RSO
 	let response = { error: "none" };
 	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
 	try {
 		const user1 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member1]);
-		const user2 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member2])[0];
-		const user3 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member3])[0];
-		const user4 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member4])[0];
+		const user2 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member2]);
+		const user3 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member3]);
+		const user4 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member4]);
 
 		console.log(user1);
 
 		const res = await db.query("INSERT INTO RSO (Admins_ID, Name, Description) VALUES (?, ?, ?)", [req.session.uid, req.body.name, req.body.description]);
 		const rsoID = parseInt(res.insertId);
-		await db.query("INSERT INTO RSOs_Students (UID, RSO_ID)", [req.session.uid, rsoID]);
-		if (user1) {
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID)", [user1.UID, rsoID]);
+		await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [req.session.uid, rsoID]);
+		if (user1[0] !== undefined) {
+			const user1ID = user1[0].UID;
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user1ID, rsoID]);
 		}
-		if (user2) {
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID)", [user2.UID, rsoID]);
+		if (user2[0] !== undefined) {
+			const user2ID = user2[0].UID;
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user2ID, rsoID]);
 		}
-		if (user3) {
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID)", [user3.UID, rsoID]);
+		if (user3[0] !== undefined) {
+			const user3ID = user3[0].UID;
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user3ID, rsoID]);
 		}
-		if (user4) {
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID)", [user4.UID, rsoID]);
+		if (user4[0] !== undefined) {
+			const user4ID = user4[0].UID;
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user4ID, rsoID]);
 		}
 	} catch (e) {
 		response.error = "fatal";

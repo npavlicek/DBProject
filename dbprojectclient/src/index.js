@@ -53,7 +53,7 @@ function Register() {
             id="firstName"
             onChange={handleChange}
           />
-  
+
           <label htmlFor="lastName">Last Name</label>
           <input
             type="text"
@@ -62,7 +62,7 @@ function Register() {
             id="lastName"
             onChange={handleChange}
           />
-  
+
           <label htmlFor="username">Username</label>
           <input
             type="text"
@@ -71,7 +71,7 @@ function Register() {
             id="username"
             onChange={handleChange}
           />
-  
+
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -80,7 +80,7 @@ function Register() {
             id="password"
             onChange={handleChange}
           />
-  
+
           <label htmlFor="role">Role</label>
           <select
             id="role"
@@ -93,13 +93,13 @@ function Register() {
             <option value="admin">Admin</option>
             <option value="superadmin">Super Admin</option>
           </select>
-  
+
           <input type="submit" value="Register" />
         </form>
       </div>
     </div>
   );
-  
+
 }
 
 
@@ -160,7 +160,7 @@ function Login() {
             value={cred.username}
             onChange={handleChange}
           />
-  
+
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -169,13 +169,13 @@ function Login() {
             value={cred.password}
             onChange={handleChange}
           />
-  
+
           <input type="submit" value="Login" />
         </form>
       </div>
     </div>
   );
-  
+
 }
 
 function Dashboard() {
@@ -184,8 +184,14 @@ function Dashboard() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState(localStorage.getItem("role"));
   const [RSOs, setRSOs] = useState([]);
+  const [selectedJoinRSO, setSelectedJoinRSO] = useState({});
 
   const nav = useNavigate();
+
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setSelectedJoinRSO(value);
+  };
 
   useEffect(() => {
     if (localStorage.getItem("loggedIn") === "true") {
@@ -202,12 +208,28 @@ function Dashboard() {
 
   }, []);
 
+  const joinRSO = (e) => {
+    e.preventDefault();
+    console.log(selectedJoinRSO);
+
+    fetch("/api/joinRSO",
+      {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ rsoID: selectedJoinRSO })
+      }
+    );
+  };
+
   return (
     <>
+      <h2>Create an RSO</h2>
       {role === "admin" && <AdminDashboard />}
       <h2>Join an RSO</h2>
-      <form>
-        <select>
+      <form onSubmit={joinRSO}>
+        <select value={selectedJoinRSO} onChange={handleChange}>
           {
             RSOs.map((value, idx) => (
               <option key={idx} value={value.RSO_ID}>{value.Name}</option>
