@@ -63,7 +63,7 @@ function Register() {
             onChange={handleChange}
           />
   
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">Email</label>
           <input
             type="text"
             name="username"
