@@ -376,3 +376,191 @@ code {
   background-color: rgb(245, 151, 123);
   color: white;
 }
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.form-box {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+}
+
+.form-box h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-box label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.form-box input,
+.form-box select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.form-box input[type="submit"],
+button {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4b6cb7;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-box input[type="submit"]:hover,
+button:hover {
+  background-color: #3b5998;
+}
+
+ul.event-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 2rem;
+}
+
+ul.event-list li {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* GENERAL PAGE STYLING */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: url('./back.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+/* CONTAINERS */
+.login-container,
+.register-container,
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 1rem;
+  min-height: 100vh;
+}
+
+.login-box,
+.register-box,
+.dashboard-box {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 2rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+}
+
+/* HEADERS */
+h1, h2, h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* FORMS */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+form input,
+form select {
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-top: 0.3rem;
+  font-size: 1rem;
+}
+
+form input[type="submit"],
+.login-link-btn,
+.register-link-btn,
+.login-join-btn,
+.admin-submit {
+  background-color: #4b6cb7;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form input[type="submit"]:hover,
+.login-link-btn:hover,
+.register-link-btn:hover,
+.login-join-btn:hover,
+.admin-submit:hover {
+  background-color: #3b5998;
+}
+
+/* TEXT & LINKS */
+.login-link-text,
+.register-link-text {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* ADMIN DASHBOARD */
+.admin-dashboard {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.admin-form h3 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}

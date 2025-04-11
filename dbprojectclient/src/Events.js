@@ -28,38 +28,40 @@ function CreatePublicEvent() {
   }
 
   return (
-    <>
-      <h2>Create Public Event</h2>
-
-      <form onSubmit={submitEvent}>
-        <label for="name">Event Name</label>
-        <input type="text" value={formData.name} onChange={updateValues} name="name" id="name" /><br />
-
-        <label for="desc">Description</label>
-        <input type="text" value={formData.desc} onChange={updateValues} name="desc" id="desc" /><br />
-
-        <label for="date">Date</label>
-        <input type="date" value={formData.date} onChange={updateValues} name="date" id="date" /><br />
-
-        <label for="start">Start Time</label>
-        <input type="time" value={formData.start} onChange={updateValues} name="start" id="start" /><br />
-
-        <label for="end">End Time</label>
-        <input type="time" value={formData.end} onChange={updateValues} name="end" id="end" /><br />
-
-        <label for="addr">Address</label>
-        <input type="text" value={formData.addr} onChange={updateValues} name="addr" id="addr" /><br />
-
-        <label for="phone">Contact Phone</label>
-        <input type="text" value={formData.phone} onChange={updateValues} name="phone" id="phone" /><br />
-
-        <label for="email">Contact Email</label>
-        <input type="text" value={formData.email} onChange={updateValues} name="email" id="email" /><br />
-
-        <input type="submit" value="Create" />
-      </form>
-    </>
+    <div className="page-container">
+      <div className="form-box">
+        <h2>Create Public Event</h2>
+        <form onSubmit={submitEvent}>
+          <label htmlFor="name">Event Name</label>
+          <input type="text" value={formData.name || ''} onChange={updateValues} name="name" id="name" />
+  
+          <label htmlFor="desc">Description</label>
+          <input type="text" value={formData.desc || ''} onChange={updateValues} name="desc" id="desc" />
+  
+          <label htmlFor="date">Date</label>
+          <input type="date" value={formData.date || ''} onChange={updateValues} name="date" id="date" />
+  
+          <label htmlFor="start">Start Time</label>
+          <input type="time" value={formData.start || ''} onChange={updateValues} name="start" id="start" />
+  
+          <label htmlFor="end">End Time</label>
+          <input type="time" value={formData.end || ''} onChange={updateValues} name="end" id="end" />
+  
+          <label htmlFor="addr">Address</label>
+          <input type="text" value={formData.addr || ''} onChange={updateValues} name="addr" id="addr" />
+  
+          <label htmlFor="phone">Contact Phone</label>
+          <input type="text" value={formData.phone || ''} onChange={updateValues} name="phone" id="phone" />
+  
+          <label htmlFor="email">Contact Email</label>
+          <input type="text" value={formData.email || ''} onChange={updateValues} name="email" id="email" />
+  
+          <input type="submit" value="Create" />
+        </form>
+      </div>
+    </div>
   );
+  
 }
 
 function CreatePrivateEvent() {
