@@ -1,7 +1,13 @@
+CREATE TABLE Universities (
+	UNI_ID INT PRIMARY KEY AUTO_INCREMENT,
+	Name VARCHAR(30)
+);
+
 CREATE TABLE Users (
 	UID INT AUTO_INCREMENT UNIQUE,
 	isAdmin BOOLEAN,
 	isSuperAdmin BOOLEAN,
+	UNI_ID INT REFERENCES Universities(UNI_ID),
 	username VARCHAR(30) PRIMARY KEY,
 	password BINARY(60),
 	firstName VARCHAR(30),
@@ -17,12 +23,15 @@ CREATE TABLE Location (
 
 CREATE TABLE Events (
 	Event_ID INT AUTO_INCREMENT PRIMARY KEY,
-	Date TIME,
+	Date DATE,
 	Start TIME,
 	End TIME,
 	Lname VARCHAR(50) REFERENCES Location(Lname),
 	Event_name VARCHAR(100),
 	Description TEXT,
+	Contact_Phone VARCHAR(20),
+	Contact_Email VARCHAR(40),
+	Address VARCHAR(50),
 	UNIQUE(Lname)
 );
 
@@ -59,18 +68,15 @@ CREATE TABLE Public_Events (
 
 CREATE TABLE Private_Events (
 	Event_ID INT PRIMARY KEY REFERENCES Events(Event_ID),
+	UNI_ID INT REFERENCES Universities(UNI_ID),
 	Admins_ID INT REFERENCES Users(UID),
 	SuperAdmins_ID INT REFERENCES Users(UID)
-);
-
-CREATE TABLE Universities (
-	UNI_ID INT PRIMARY KEY AUTO_INCREMENT,
-	Name VARCHAR(30)
 );
 
 CREATE TABLE RSO (
 	RSO_ID INT PRIMARY KEY AUTO_INCREMENT,
 	Active BOOLEAN NOT NULL DEFAULT 0,
+	UNI_ID INT REFERENCES Universities(UNI_ID),
 	Admins_ID INT REFERENCES Users(UID),
 	Name VARCHAR(30),
 	Description TEXT
@@ -97,7 +103,7 @@ AND (SELECT COUNT(*) FROM RSOs_Students WHERE RSO_ID = NEW.RSO_ID) >= 5;
 CREATE TRIGGER RSOStatusUpdateP
 AFTER DELETE ON RSOs_Students
 FOR EACH ROW
-UPDATE RSOs 
+UPDATE RSO
 SET Active = 0
 WHERE RSO_ID = OLD.RSO_ID
 AND (SELECT COUNT(*) FROM RSOs_Students WHERE RSO_ID = OLD.RSO_ID) < 5;
@@ -151,3 +157,7 @@ BEGIN
 END//
 
 DELIMITER ;
+
+-- DEFAULT VALUES
+INSERT INTO Universities (Name) VALUES ("University of Central Florida");
+INSERT INTO Universities (Name) VALUES ("University of South Florida");

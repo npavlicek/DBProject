@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, createBrowserRouter, RouterProvider } from 'react-router';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+import { PublicEvents, PrivateEvents, RSOEvents, CreatePublicEvent, CreatePrivateEvent, CreateRSOEvent } from './Events';
 
 function Register() {
   const nav = useNavigate();
@@ -12,8 +13,25 @@ function Register() {
     password: '',
     firstName: '',
     lastName: '',
-    role: 'student'
+    role: 'student',
+    uni: 0
   });
+
+  const [unis, setUnis] = useState([]);
+
+  useEffect(_ => {
+    fetch("/api/getUniversities", {
+      method: "get"
+    }).then(data => {
+      return data.json();
+    }).then(json => {
+      setUnis(json.unis);
+      setFormData({
+        ...formData,
+        uni: json.unis[0].UNI_ID,
+      });
+    });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,7 +53,7 @@ function Register() {
     }).then(val => val.json())
       .then(json => {
         if (json.error === "none") {
-         nav("/login");
+          nav("/login");
         }
       });
   };
@@ -93,20 +111,32 @@ function Register() {
             <option value="superadmin">Super Admin</option>
           </select>
 
+          <label htmlFor="role">University</label>
+          <select
+            id="uni"
+            name="uni"
+            value={formData.uni}
+            onChange={handleChange}
+            style={{ marginBottom: '1.2rem', padding: '0.65rem', borderRadius: '6px', border: '1px solid #ccc' }}
+          >
+            {
+              unis.map((val, idx) => (
+                <option key={idx} value={val.UNI_ID}>{val.Name}</option>
+              ))
+            }
+          </select>
           <input type="submit" value="Register" />
         </form>
 
         <p className="login-link-text">
-  Already have an account?
-</p>
-<button
-  className="login-link-btn"
-  onClick={() => nav("/login")}
->
-  Log in here
-</button>
-
-
+          Already have an account?
+        </p>
+        <button
+          className="login-link-btn"
+          onClick={() => nav("/login")}
+        >
+          Log in here
+        </button>
       </div>
     </div>
   );
@@ -171,7 +201,7 @@ function Login() {
             value={cred.username}
             onChange={handleChange}
           />
-  
+
           <label htmlFor="password">Password</label>
           <input
             type="password"
@@ -180,10 +210,10 @@ function Login() {
             value={cred.password}
             onChange={handleChange}
           />
-  
+
           <input type="submit" value="Login" />
         </form>
-  
+
         <p className="register-link-text">
           Don’t have an account?
         </p>
@@ -196,7 +226,7 @@ function Login() {
       </div>
     </div>
   );
-  
+
 
 }
 
@@ -206,7 +236,9 @@ function Dashboard() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState(localStorage.getItem("role"));
   const [RSOs, setRSOs] = useState([]);
-  const [selectedJoinRSO, setSelectedJoinRSO] = useState({});
+  const [currentRSOs, setCurrentRSOs] = useState([]);
+  const [selectedJoinRSO, setSelectedJoinRSO] = useState(0);
+  const [selectedLeaveRSO, setSelectedLeaveRSO] = useState(0);
 
   const nav = useNavigate();
 
@@ -215,19 +247,34 @@ function Dashboard() {
     setSelectedJoinRSO(value);
   };
 
+  const handleSelectLeaveRSO = (e) => {
+    setSelectedLeaveRSO(e.target.value);
+  };
+
   useEffect(() => {
     if (localStorage.getItem("loggedIn") === "true") {
       setLoggedIn(true);
     } else {
-     nav("/login");
+      nav("/login");
     }
 
     fetch('/api/getRSOs', {
       method: 'get'
     }).then(data => { return data.json() }).then(json => {
       setRSOs(json.rsos);
+      if (json.rsos[0]) {
+        setSelectedJoinRSO(json.rsos[0].RSO_ID);
+      }
     });
 
+    fetch('/api/getCurrentRSOs', {
+      method: 'get'
+    }).then(data => { return data.json() }).then(json => {
+      setCurrentRSOs(json.rsos);
+      if (json.rsos[0]) {
+        setSelectedLeaveRSO(json.rsos[0].RSO_ID);
+      }
+    });
   }, []);
 
   const joinRSO = (e) => {
@@ -242,7 +289,40 @@ function Dashboard() {
         },
         body: JSON.stringify({ rsoID: selectedJoinRSO })
       }
-    );
+    ).then(_ => {
+      fetch('/api/getCurrentRSOs', {
+        method: 'get'
+      }).then(data => { return data.json() }).then(json => {
+        setCurrentRSOs(json.rsos);
+        if (json.rsos[0]) {
+          setSelectedLeaveRSO(json.rsos[0].RSO_ID);
+        }
+      });
+    });
+  };
+
+  const leaveRSO = (e) => {
+    e.preventDefault();
+
+    fetch('/api/leaveRSO', {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        RSO_ID: selectedLeaveRSO
+      })
+    }).then(_ => {
+      fetch('/api/getCurrentRSOs', {
+        method: 'get'
+      }).then(data => { return data.json() }).then(json => {
+        setCurrentRSOs(json.rsos);
+        if (json.rsos[0]) {
+          setSelectedLeaveRSO(json.rsos[0].RSO_ID);
+        }
+      });
+    });
+
   };
 
   return (
@@ -250,14 +330,19 @@ function Dashboard() {
       <div className="dashboard-box">
         <h1>Welcome, {firstName || "Guest"} 👋</h1>
         <p className="role-text">Role: {role || "visitor"}</p>
-  
+
         {role === "admin" && (
           <>
-            <h2>Create an RSO</h2>
-            <AdminDashboard />
+            <AdminDashboard setRSOs={setRSOs} setSelectedRSO={setSelectedJoinRSO} />
           </>
         )}
-  
+
+        {role === "superadmin" && (
+          <>
+            <SuperAdminDashboard />
+          </>
+        )}
+
         <h2>Join an RSO</h2>
         {loggedIn ? (
           <form onSubmit={joinRSO} className="dashboard-form">
@@ -276,19 +361,41 @@ function Dashboard() {
             Log in to join RSOs
           </button>
         )}
+
+        <h2>Leave an RSO</h2>
+        {loggedIn ? (
+          <form onSubmit={leaveRSO} className="dashboard-form">
+            <select value={selectedLeaveRSO} onChange={handleSelectLeaveRSO}>
+              {currentRSOs && currentRSOs.map((value, idx) => (
+                <option key={idx} value={value.RSO_ID}>{value.Name}</option>
+              ))}
+            </select>
+            <input type="submit" value="Leave" />
+          </form>
+        ) : (
+          <button
+            className="login-join-btn"
+            onClick={() => nav("/login")}
+          >
+            Log in to join RSOs
+          </button>
+        )}
+
+        <input type="button" value="View RSO Events" className="login-join-btn" onClick={() => nav("/rsoevs")} /><br />
+        <input type="button" value="View Private Events" className="login-join-btn" onClick={() => nav("/privevs")} /><br />
+        <input type="button" value="View Public Events" className="login-join-btn" onClick={() => nav("/pubevs")} /><br />
       </div>
     </div>
   );
-  
-  
+
+
 }
 
 function SuperAdminDashboard() {
   const [university, setUniversity] = useState("");
 }
 
-function AdminDashboard() {
-  const [RSOs, setRSOs] = useState([]);
+function AdminDashboard({ setRSOs, setSelectedRSO }) {
   const [unis, setUnis] = useState([]);
   const [RSOData, setRSOData] = useState({});
 
@@ -320,6 +427,15 @@ function AdminDashboard() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(RSOData)
+    }).then(_ => {
+      fetch('/api/getRSOs', {
+        method: 'get'
+      }).then(data => { return data.json() }).then(json => {
+        setRSOs(json.rsos);
+        if (json.rsos[0]) {
+          setSelectedRSO(json.rsos[0].RSO_ID);
+        }
+      });
     });
   };
 
@@ -327,22 +443,22 @@ function AdminDashboard() {
     <div className="admin-dashboard">
       <form onSubmit={handleCreateRSO} className="admin-form">
         <h3>Create a New RSO</h3>
-  
+
         <div className="form-group">
           <label htmlFor="name">RSO Name</label>
           <input type="text" name="name" id="name" onChange={handleChange} />
         </div>
-  
+
         <div className="form-group">
           <label htmlFor="description">Description</label>
           <input type="text" name="description" id="description" onChange={handleChange} />
         </div>
-  
+
         <div className="form-group">
           <label htmlFor="adminEmail">Admin Email</label>
           <input type="text" name="adminEmail" id="adminEmail" onChange={handleChange} />
         </div>
-  
+
         <h4>Members</h4>
         <div className="form-grid">
           <input type="text" name="member1" placeholder="Member 1" onChange={handleChange} />
@@ -350,28 +466,52 @@ function AdminDashboard() {
           <input type="text" name="member3" placeholder="Member 3" onChange={handleChange} />
           <input type="text" name="member4" placeholder="Member 4" onChange={handleChange} />
         </div>
-  
+
         <div className="form-group">
           <label htmlFor="uni">University</label>
           <select name="uni" id="uni" onChange={handleChange}>
             <option value="">Select a university</option>
             {unis.map((item, index) => (
-              <option key={index} value={item.Name}>{item.Name}</option>
+              <option key={index} value={item.UNI_ID}>{item.Name}</option>
             ))}
           </select>
         </div>
-  
+
         <input type="submit" value="Create RSO" className="admin-submit" />
       </form>
     </div>
   );
-  
+
 }
 
 let router = createBrowserRouter([
   {
     path: "/",
     Component: Dashboard
+  },
+  {
+    path: "/rsoevs",
+    Component: RSOEvents
+  },
+  {
+    path: "/privevs",
+    Component: PrivateEvents,
+  },
+  {
+    path: "/pubevs",
+    Component: PublicEvents,
+  },
+  {
+    path: "/create/publicEv",
+    Component: CreatePublicEvent
+  },
+  {
+    path: "/create/privateEv",
+    Component: CreatePrivateEvent
+  },
+  {
+    path: "/create/rsoEv",
+    Component: CreateRSOEvent
   },
   {
     path: "/dashboard",

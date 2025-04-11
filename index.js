@@ -2,6 +2,7 @@ const express = require("express");
 const mariadb = require("mariadb");
 const expressSession = require("express-session");
 const bcrypt = require("bcrypt");
+const proxy = require("express-http-proxy");
 const app = express();
 const port = 8000;
 
@@ -23,7 +24,7 @@ app.post("/api/register", async (req, res) => {
 	let response = { error: "none" };
 	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
 	try {
-		await db.query("INSERT INTO Users (username, password, firstName, lastName, isAdmin, isSuperAdmin) VALUES (?, ?, ?, ?, ?, ?)", [req.body.username, hashedPass, req.body.firstName, req.body.lastName, isAdmin, isSuperAdmin]);
+		await db.query("INSERT INTO Users (username, password, firstName, lastName, isAdmin, isSuperAdmin, UNI_ID) VALUES (?, ?, ?, ?, ?, ?, ?)", [req.body.username, hashedPass, req.body.firstName, req.body.lastName, isAdmin, isSuperAdmin, req.body.uni]);
 	} catch (e) {
 		response.error = "username_in_use";
 		console.error(e);
@@ -46,7 +47,7 @@ app.post("/api/login", async (req, res) => {
 	let userRecord = undefined;
 	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
 	try {
-		userRecord = await db.query("SELECT UID, firstName, lastName, username, password, isAdmin, isSuperAdmin FROM Users WHERE username = ?", [username]);
+		userRecord = await db.query("SELECT UID, firstName, lastName, username, password, isAdmin, isSuperAdmin, UNI_ID FROM Users WHERE username = ?", [username]);
 	} catch (e) {
 		response.error = "fatal";
 		console.error(e);
@@ -61,6 +62,7 @@ app.post("/api/login", async (req, res) => {
 			req.session.cookie.maxAge = mills_in_minute * 30;
 			req.session.isAdmin = userRecord[0].isAdmin;
 			req.session.isSuperAdmin = userRecord[0].isSuperAdmin;
+			req.session.UNI_ID = userRecord[0].UNI_ID;
 
 			response.firstName = userRecord[0].firstName;
 			response.lastName = userRecord[0].lastName;
@@ -103,7 +105,7 @@ app.get("/api/getRSOs", async (req, res) => {
 	let response = { error: "none" };
 	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
 	try {
-		const res = await db.query("SELECT * FROM RSO");
+		const res = await db.query("SELECT * FROM RSO WHERE UNI_ID = ?", [req.session.UNI_ID]);
 		response.rsos = res;
 	} catch (e) {
 		response.error = "fatal";
@@ -116,7 +118,6 @@ app.get("/api/getRSOs", async (req, res) => {
 });
 
 app.post("/api/joinRSO", async (req, res) => {
-	console.log(req.body);
 	let response = { error: "none" };
 	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
 	try {
@@ -131,35 +132,135 @@ app.post("/api/joinRSO", async (req, res) => {
 	res.send(response);
 });
 
+app.get("/api/getCurrentRSOs", async (req, res) => {
+	let response = { error: "none" };
+	response.rsos = [];
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		const rsos = await db.query("SELECT * FROM RSOs_Students WHERE UID = ?", [req.session.uid]);
+
+		for (let i = 0; i < rsos.length; i++) {
+			const rso = await db.query("SELECT * FROM RSO WHERE RSO_ID = ?", [rsos[i].RSO_ID]);
+			response.rsos.push(rso[0]);
+		}
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+app.get("/api/getPublicEvents", async (req, res) => {
+	let response = { error: "none" };
+	response.evs = [];
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		const evs = await db.query("SELECT * FROM Public_Events");
+
+		for (let i = 0; i < evs.length; i++) {
+			const ev = await db.query("SELECT * FROM Events WHERE Event_ID = ?", [evs[i].Event_ID]);
+			response.evs.push(ev[0]);
+		}
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+app.get("/api/getPrivateEvents", async (req, res) => {
+	let response = { error: "none" };
+	response.evs = [];
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		const evs = await db.query("SELECT * FROM Private_Events WHERE UNI_ID = ?", [req.session.UNI_ID]);
+
+		for (let i = 0; i < evs.length; i++) {
+			const ev = await db.query("SELECT * FROM Events WHERE Event_ID = ?", [evs[i].Event_ID]);
+			response.evs.push(ev[0]);
+		}
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+app.get("/api/getRSOEvents", async (req, res) => {
+	let response = { error: "none" };
+	response.evs = [];
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		const rsos = await db.query("SELECT * FROM RSOs_Students WHERE UID = ?", [req.session.uid]);
+		for (let j = 0; j < rsos.length; j++) {
+			const evs = await db.query("SELECT * FROM RSO_Events WHERE RSO_ID = ?", [rsos[j].RSO_ID]);
+
+			for (let i = 0; i < evs.length; i++) {
+				const ev = await db.query("SELECT * FROM Events WHERE Event_ID = ?", [evs[i].Event_ID]);
+				response.evs.push(ev[0]);
+			}
+		}
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+async function getUIDByUsername(username) {
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	let res;
+	try {
+		res = await db.query("SELECT UID FROM Users WHERE username = ?", [username]);
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	let uid = false;
+	if (res.length > 0) {
+		uid = res[0].UID;
+	}
+
+	return uid;
+}
+
 app.post("/api/createRSO", async (req, res) => {
 	let response = { error: "none" };
 	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
 	try {
-		const user1 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member1]);
-		const user2 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member2]);
-		const user3 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member3]);
-		const user4 = await db.query("SELECT UID FROM Users WHERE username = ?", [req.body.member4]);
+		const user1 = await getUIDByUsername(req.body.member1);
+		const user2 = await getUIDByUsername(req.body.member2);
+		const user3 = await getUIDByUsername(req.body.member3);
+		const user4 = await getUIDByUsername(req.body.member4);
 
-		console.log(user1);
-
-		const res = await db.query("INSERT INTO RSO (Admins_ID, Name, Description) VALUES (?, ?, ?)", [req.session.uid, req.body.name, req.body.description]);
+		const res = await db.query("INSERT INTO RSO (Admins_ID, Name, Description, UNI_ID) VALUES (?, ?, ?, ?)", [req.session.uid, req.body.name, req.body.description, req.body.uni]);
 		const rsoID = parseInt(res.insertId);
 		await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [req.session.uid, rsoID]);
-		if (user1[0] !== undefined) {
-			const user1ID = user1[0].UID;
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user1ID, rsoID]);
+		if (user1 !== false) {
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user1, rsoID]);
 		}
-		if (user2[0] !== undefined) {
-			const user2ID = user2[0].UID;
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user2ID, rsoID]);
+		if (user2 !== false) {
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user2, rsoID]);
 		}
-		if (user3[0] !== undefined) {
-			const user3ID = user3[0].UID;
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user3ID, rsoID]);
+		if (user3 !== false) {
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user3, rsoID]);
 		}
-		if (user4[0] !== undefined) {
-			const user4ID = user4[0].UID;
-			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user4ID, rsoID]);
+		if (user4 !== false) {
+			await db.query("INSERT INTO RSOs_Students (UID, RSO_ID) VALUES (?, ?)", [user4, rsoID]);
 		}
 	} catch (e) {
 		response.error = "fatal";
@@ -170,6 +271,85 @@ app.post("/api/createRSO", async (req, res) => {
 
 	res.send(response);
 });
+
+app.post("/api/leaveRSO", async (req, res) => {
+	let response = { error: "none" };
+
+	const RSO_ID = req.body.RSO_ID;
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		await db.query("DELETE FROM RSOs_Students WHERE RSO_ID = ? AND UID = ?", [RSO_ID, req.session.uid]);
+	} catch (err) {
+		console.error(err);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+app.post("/api/createPublicEvent", async (req, res) => {
+	let response = { error: "none" };
+
+	const data = req.body;
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		const insertInfo = await db.query("INSERT INTO Events (Date, Start, End, Event_name, Description, Contact_Phone, Contact_Email, Address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [data.date, data.start, data.end, data.name, data.desc, data.phone, data.email, data.addr]);
+
+		await db.query("INSERT INTO Public_Events (Event_ID, Admins_ID) VALUES (?, ?)", [parseInt(insertInfo.insertId), req.session.uid]);
+
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+app.post("/api/createPrivateEvent", async (req, res) => {
+	let response = { error: "none" };
+
+	const data = req.body;
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		const insertInfo = await db.query("INSERT INTO Events (Date, Start, End, Event_name, Description, Contact_Phone, Contact_Email, Address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [data.date, data.start, data.end, data.name, data.desc, data.phone, data.email, data.addr]);
+
+		await db.query("INSERT INTO Private_Events (Event_ID, Admins_ID, UNI_ID) VALUES (?, ?, ?)", [parseInt(insertInfo.insertId), req.session.uid, req.session.UNI_ID]);
+
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+app.post("/api/createRSOEvent", async (req, res) => {
+	let response = { error: "none" };
+
+	const data = req.body;
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		const insertInfo = await db.query("INSERT INTO Events (Date, Start, End, Event_name, Description, Contact_Phone, Contact_Email, Address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", [data.date, data.start, data.end, data.name, data.desc, data.phone, data.email, data.addr]);
+
+		await db.query("INSERT INTO RSO_Events (Event_ID, RSO_ID) VALUES (?, ?)", [parseInt(insertInfo.insertId), data.RSO_ID]);
+
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+app.use(proxy("http://127.0.0.1:3000"));
 
 app.listen(port, () => {
 	console.log(`Listening on port: ${port}`);
