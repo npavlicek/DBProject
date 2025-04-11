@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
+// ----- Create Public Event -----
 function CreatePublicEvent() {
   const [formData, setFormData] = useState({});
 
   const updateValues = (e) => {
-    e.preventDefault();
-
     const { name, value } = e.target;
-
     setFormData({
       ...formData,
       [name]: value
@@ -17,15 +15,12 @@ function CreatePublicEvent() {
 
   const submitEvent = (e) => {
     e.preventDefault();
-
     fetch("/api/createPublicEvent", {
       method: "post",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
     });
-  }
+  };
 
   return (
     <div className="page-container">
@@ -34,44 +29,41 @@ function CreatePublicEvent() {
         <form onSubmit={submitEvent}>
           <label htmlFor="name">Event Name</label>
           <input type="text" value={formData.name || ''} onChange={updateValues} name="name" id="name" />
-  
+
           <label htmlFor="desc">Description</label>
           <input type="text" value={formData.desc || ''} onChange={updateValues} name="desc" id="desc" />
-  
+
           <label htmlFor="date">Date</label>
           <input type="date" value={formData.date || ''} onChange={updateValues} name="date" id="date" />
-  
+
           <label htmlFor="start">Start Time</label>
           <input type="time" value={formData.start || ''} onChange={updateValues} name="start" id="start" />
-  
+
           <label htmlFor="end">End Time</label>
           <input type="time" value={formData.end || ''} onChange={updateValues} name="end" id="end" />
-  
+
           <label htmlFor="addr">Address</label>
           <input type="text" value={formData.addr || ''} onChange={updateValues} name="addr" id="addr" />
-  
+
           <label htmlFor="phone">Contact Phone</label>
           <input type="text" value={formData.phone || ''} onChange={updateValues} name="phone" id="phone" />
-  
+
           <label htmlFor="email">Contact Email</label>
           <input type="text" value={formData.email || ''} onChange={updateValues} name="email" id="email" />
-  
+
           <input type="submit" value="Create" />
         </form>
       </div>
     </div>
   );
-  
 }
 
+// ----- Create Private Event -----
 function CreatePrivateEvent() {
   const [formData, setFormData] = useState({});
 
   const updateValues = (e) => {
-    e.preventDefault();
-
     const { name, value } = e.target;
-
     setFormData({
       ...formData,
       [name]: value
@@ -80,71 +72,67 @@ function CreatePrivateEvent() {
 
   const submitEvent = (e) => {
     e.preventDefault();
-
     fetch("/api/createPrivateEvent", {
       method: "post",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
     });
-  }
+  };
 
   return (
-    <>
-      <h2>Create Private Event</h2>
+    <div className="page-container">
+      <div className="form-box">
+        <h2>Create Private Event</h2>
+        <form onSubmit={submitEvent}>
+          <label htmlFor="name">Event Name</label>
+          <input type="text" value={formData.name || ''} onChange={updateValues} name="name" id="name" />
 
-      <form onSubmit={submitEvent}>
-        <label for="name">Event Name</label>
-        <input type="text" value={formData.name} onChange={updateValues} name="name" id="name" /><br />
+          <label htmlFor="desc">Description</label>
+          <input type="text" value={formData.desc || ''} onChange={updateValues} name="desc" id="desc" />
 
-        <label for="desc">Description</label>
-        <input type="text" value={formData.desc} onChange={updateValues} name="desc" id="desc" /><br />
+          <label htmlFor="date">Date</label>
+          <input type="date" value={formData.date || ''} onChange={updateValues} name="date" id="date" />
 
-        <label for="date">Date</label>
-        <input type="date" value={formData.date} onChange={updateValues} name="date" id="date" /><br />
+          <label htmlFor="start">Start Time</label>
+          <input type="time" value={formData.start || ''} onChange={updateValues} name="start" id="start" />
 
-        <label for="start">Start Time</label>
-        <input type="time" value={formData.start} onChange={updateValues} name="start" id="start" /><br />
+          <label htmlFor="end">End Time</label>
+          <input type="time" value={formData.end || ''} onChange={updateValues} name="end" id="end" />
 
-        <label for="end">End Time</label>
-        <input type="time" value={formData.end} onChange={updateValues} name="end" id="end" /><br />
+          <label htmlFor="addr">Address</label>
+          <input type="text" value={formData.addr || ''} onChange={updateValues} name="addr" id="addr" />
 
-        <label for="addr">Address</label>
-        <input type="text" value={formData.addr} onChange={updateValues} name="addr" id="addr" /><br />
+          <label htmlFor="phone">Contact Phone</label>
+          <input type="text" value={formData.phone || ''} onChange={updateValues} name="phone" id="phone" />
 
-        <label for="phone">Contact Phone</label>
-        <input type="text" value={formData.phone} onChange={updateValues} name="phone" id="phone" /><br />
+          <label htmlFor="email">Contact Email</label>
+          <input type="text" value={formData.email || ''} onChange={updateValues} name="email" id="email" />
 
-        <label for="email">Contact Email</label>
-        <input type="text" value={formData.email} onChange={updateValues} name="email" id="email" /><br />
-
-        <input type="submit" value="Create" />
-      </form>
-    </>
+          <input type="submit" value="Create" />
+        </form>
+      </div>
+    </div>
   );
 }
 
+// ----- Create RSO Event -----
 function CreateRSOEvent() {
   const [formData, setFormData] = useState({});
   const [RSOs, setRSOs] = useState([]);
 
   useEffect(() => {
-    fetch("/api/getCurrentRSOs", {
-      method: "get",
-    }).then(data => data.json()).then(json => {
-      setRSOs(json.rsos);
-      if (json.rsos[0]) {
-        formData.RSO_ID = 0;
-      }
-    });
+    fetch("/api/getCurrentRSOs")
+      .then(res => res.json())
+      .then(json => {
+        setRSOs(json.rsos);
+        if (json.rsos.length > 0) {
+          setFormData(prev => ({ ...prev, RSO_ID: json.rsos[0].RSO_ID }));
+        }
+      });
   }, []);
 
   const updateValues = (e) => {
-    e.preventDefault();
-
     const { name, value } = e.target;
-
     setFormData({
       ...formData,
       [name]: value
@@ -153,160 +141,143 @@ function CreateRSOEvent() {
 
   const submitEvent = (e) => {
     e.preventDefault();
-
     fetch("/api/createRSOEvent", {
       method: "post",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
     });
-  }
+  };
 
   return (
-    <>
-      <h2>Create RSO Event</h2>
+    <div className="page-container">
+      <div className="form-box">
+        <h2>Create RSO Event</h2>
+        <form onSubmit={submitEvent}>
+          <label htmlFor="name">Event Name</label>
+          <input type="text" value={formData.name || ''} onChange={updateValues} name="name" id="name" />
 
-      <form onSubmit={submitEvent}>
-        <label for="name">Event Name</label>
-        <input type="text" value={formData.name} onChange={updateValues} name="name" id="name" /><br />
+          <label htmlFor="desc">Description</label>
+          <input type="text" value={formData.desc || ''} onChange={updateValues} name="desc" id="desc" />
 
-        <label for="desc">Description</label>
-        <input type="text" value={formData.desc} onChange={updateValues} name="desc" id="desc" /><br />
+          <label htmlFor="date">Date</label>
+          <input type="date" value={formData.date || ''} onChange={updateValues} name="date" id="date" />
 
-        <label for="date">Date</label>
-        <input type="date" value={formData.date} onChange={updateValues} name="date" id="date" /><br />
+          <label htmlFor="start">Start Time</label>
+          <input type="time" value={formData.start || ''} onChange={updateValues} name="start" id="start" />
 
-        <label for="start">Start Time</label>
-        <input type="time" value={formData.start} onChange={updateValues} name="start" id="start" /><br />
+          <label htmlFor="end">End Time</label>
+          <input type="time" value={formData.end || ''} onChange={updateValues} name="end" id="end" />
 
-        <label for="end">End Time</label>
-        <input type="time" value={formData.end} onChange={updateValues} name="end" id="end" /><br />
-
-        <label for="RSO_ID">RSO</label>
-        <select name="RSO_ID" id="RSO_ID" value={formData.RSO_ID} onChange={updateValues}>
-          {
-            RSOs.map((val, idx) => (
+          <label htmlFor="RSO_ID">RSO</label>
+          <select name="RSO_ID" id="RSO_ID" value={formData.RSO_ID || ''} onChange={updateValues}>
+            {RSOs.map((val, idx) => (
               <option key={idx} value={val.RSO_ID}>{val.Name}</option>
-            ))
-          }
-        </select><br />
+            ))}
+          </select>
 
-        <label for="addr">Address</label>
-        <input type="text" value={formData.addr} onChange={updateValues} name="addr" id="addr" /><br />
+          <label htmlFor="addr">Address</label>
+          <input type="text" value={formData.addr || ''} onChange={updateValues} name="addr" id="addr" />
 
-        <label for="phone">Contact Phone</label>
-        <input type="text" value={formData.phone} onChange={updateValues} name="phone" id="phone" /><br />
+          <label htmlFor="phone">Contact Phone</label>
+          <input type="text" value={formData.phone || ''} onChange={updateValues} name="phone" id="phone" />
 
-        <label for="email">Contact Email</label>
-        <input type="text" value={formData.email} onChange={updateValues} name="email" id="email" /><br />
+          <label htmlFor="email">Contact Email</label>
+          <input type="text" value={formData.email || ''} onChange={updateValues} name="email" id="email" />
 
-        <input type="submit" value="Create" />
-      </form>
-    </>
+          <input type="submit" value="Create" />
+        </form>
+      </div>
+    </div>
   );
 }
 
-function Event({ ev, key }) {
+// ----- Event Card -----
+function Event({ ev }) {
   return (
-    <li key={key}>
+    <li className="event-card">
       <h3>{ev.Event_name}</h3>
-      <p>{ev.Description}</p>
-      <p>{ev.Date}</p>
-      <p>{ev.Start}</p>
-      <p>{ev.End}</p>
-      <p>{ev.Contact_Phone}</p>
-      <p>{ev.Contact_Email}</p>
-      <p>{ev.Address}</p>
+      <p><strong>Description:</strong> {ev.Description}</p>
+      <p><strong>Date:</strong> {ev.Date}</p>
+      <p><strong>Start:</strong> {ev.Start}</p>
+      <p><strong>End:</strong> {ev.End}</p>
+      <p><strong>Phone:</strong> {ev.Contact_Phone}</p>
+      <p><strong>Email:</strong> {ev.Contact_Email}</p>
+      <p><strong>Address:</strong> {ev.Address}</p>
     </li>
   );
 }
 
+// ----- Public Events -----
 function PublicEvents() {
   const [events, setEvents] = useState([]);
   const nav = useNavigate();
 
   useEffect(() => {
-    fetch("/api/getPublicEvents", {
-      method: "get"
-    }).then(data => data.json()).then(json => {
-      setEvents(json.evs);
-    });
+    fetch("/api/getPublicEvents")
+      .then(res => res.json())
+      .then(json => setEvents(json.evs));
   }, []);
 
   return (
-    <>
+    <div className="page-container">
       <h2>Public Events</h2>
-      <input type="button" value="Create Public Event" onClick={_ => nav("/create/publicEv")} />
-      <ul>
-        {
-          events.map((val, idx) => (
-            <Event key={idx} ev={val} />
-          ))
-        }
+      <button className="login-join-btn" onClick={() => nav("/create/publicEv")}>Create Public Event</button>
+      <ul className="event-list">
+        {events.map((ev, idx) => <Event key={idx} ev={ev} />)}
       </ul>
-    </>
+    </div>
   );
 }
 
+// ----- Private Events -----
 function PrivateEvents() {
   const [events, setEvents] = useState([]);
   const nav = useNavigate();
 
   useEffect(() => {
-    fetch("/api/getPrivateEvents", {
-      method: "get"
-    }).then(data => data.json()).then(json => {
-      setEvents(json.evs);
-    });
+    fetch("/api/getPrivateEvents")
+      .then(res => res.json())
+      .then(json => setEvents(json.evs));
   }, []);
 
   return (
-    <>
+    <div className="page-container">
       <h2>Private Events</h2>
-      <input type="button" value="Create Private Event" onClick={_ => nav("/create/privateEv")} />
-      <ul>
-        {
-          events.map((val, idx) => (
-            <Event key={idx} ev={val} />
-          ))
-        }
+      <button className="login-join-btn" onClick={() => nav("/create/privateEv")}>Create Private Event</button>
+      <ul className="event-list">
+        {events.map((ev, idx) => <Event key={idx} ev={ev} />)}
       </ul>
-    </>
+    </div>
   );
 }
 
+// ----- RSO Events -----
 function RSOEvents() {
   const [events, setEvents] = useState([]);
   const nav = useNavigate();
 
   useEffect(() => {
-    fetch("/api/getRSOEvents", {
-      method: "get"
-    }).then(data => data.json()).then(json => {
-      setEvents(json.evs);
-    });
+    fetch("/api/getRSOEvents")
+      .then(res => res.json())
+      .then(json => setEvents(json.evs));
   }, []);
 
-  const createEvent = (e) => {
-    e.preventDefault();
-
-    nav("/create/rsoEv");
-  }
-
   return (
-    <>
+    <div className="page-container">
       <h2>RSO Events</h2>
-      <input type="button" value="Create RSO Event" onClick={createEvent} />
-      <ul>
-        {
-          events.map((val, idx) => (
-            <Event key={idx} ev={val} />
-          ))
-        }
+      <button className="login-join-btn" onClick={() => nav("/create/rsoEv")}>Create RSO Event</button>
+      <ul className="event-list">
+        {events.map((ev, idx) => <Event key={idx} ev={ev} />)}
       </ul>
-    </>
+    </div>
   );
 }
 
-export { PublicEvents, PrivateEvents, RSOEvents, CreatePublicEvent, CreatePrivateEvent, CreateRSOEvent };
+export {
+  PublicEvents,
+  PrivateEvents,
+  RSOEvents,
+  CreatePublicEvent,
+  CreatePrivateEvent,
+  CreateRSOEvent
+};

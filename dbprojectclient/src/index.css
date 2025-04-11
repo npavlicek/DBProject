@@ -564,3 +564,38 @@ form input[type="submit"]:hover,
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
+
+ul.event-list {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto 0;
+}
+
+.event-card {
+  background-color: #fff;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.event-card h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 0.75rem;
+}
+
+.event-card p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #444;
+}
