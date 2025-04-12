@@ -1,3 +1,7 @@
+CREATE USER 'niko'@localhost;
+GRANT ALL ON *.* TO 'niko'@localhost;
+CREATE DATABASE CEW;
+
 USE CEW;
 
 CREATE TABLE Universities (
