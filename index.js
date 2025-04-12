@@ -349,6 +349,62 @@ app.post("/api/createRSOEvent", async (req, res) => {
 	res.send(response);
 });
 
+app.post("/api/postComment", async (req, res) => {
+	let response = { error: "none" };
+
+	const data = req.body;
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		await db.query("INSERT INTO Comments (Event_ID, User_ID, Comment_text, Comment_rating, Comment_timestamp) VALUES (?, ?, ?, ?, ?)", [data.Event_ID, req.session.uid, data.comment, data.rating, new Date().toISOString().slice(0, 19).replace('T', ' ')]);
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
+async function getUsernameByID(id) {
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	let res;
+	try {
+		res = await db.query("SELECT username FROM Users WHERE UID = ?", [id]);
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	if (res[0]) {
+		return res[0].username;
+	} else {
+		return '';
+	}
+}
+
+app.post("/api/getComments", async (req, res) => {
+	let response = { error: "none" };
+
+	const data = req.body;
+
+	const db = await mariadb.createConnection({ socketPath: '/run/mysqld/mysqld.sock', user: 'niko', database: "CEW" });
+	try {
+		response.comments = await db.query("SELECT * FROM Comments WHERE Event_ID = ?", [data.Event_ID]);
+
+		for (let i = 0; i < response.comments.length; i++) {
+			response.comments[i].username = await getUsernameByID(response.comments[i].User_ID);
+		}
+	} catch (e) {
+		console.error(e);
+	} finally {
+		db.end();
+	}
+
+	res.send(response);
+});
+
 app.use(proxy("http://127.0.0.1:3000"));
 
 app.listen(port, () => {

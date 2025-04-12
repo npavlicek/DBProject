@@ -1,3 +1,5 @@
+USE CEW;
+
 CREATE TABLE Universities (
 	UNI_ID INT PRIMARY KEY AUTO_INCREMENT,
 	Name VARCHAR(30)
@@ -78,7 +80,7 @@ CREATE TABLE RSO (
 	Active BOOLEAN NOT NULL DEFAULT 0,
 	UNI_ID INT REFERENCES Universities(UNI_ID),
 	Admins_ID INT REFERENCES Users(UID),
-	Name VARCHAR(30),
+	Name VARCHAR(200),
 	Description TEXT
 );
 
@@ -158,6 +160,24 @@ END//
 
 DELIMITER ;
 
--- DEFAULT VALUES
+-- EXAMPLE DATA 
 INSERT INTO Universities (Name) VALUES ("University of Central Florida");
 INSERT INTO Universities (Name) VALUES ("University of South Florida");
+
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 0, 1, "wojciech@aol.com", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Averia", "Moses");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 1, 2, "aglassis@aol.com", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Niklaus", "Fuller");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 0, 1, "netsfr@mac.com", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Oakley", "Baker");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (1, 0, 2, "liedra@optonline.net", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Ezra", "Wood");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 0, 1, "gfxguy@comcast.net", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Natalia", "Livingston");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 0, 2, "mcmillan@live.com", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Ambrose", "McDaniel");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 1, 1, "crowl@comcast.net", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Dahlia", "Shah");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 0, 2, "fbriere@aol.com", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Zain", "Farley");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 1, 1, "mcrawfor@msn.com", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Wrenley", "Lambert");
+INSERT INTO Users (isAdmin, isSuperAdmin, UNI_ID, username, password, firstName, lastName) VALUES (0, 0, 2, "iamcal@optonline.net", "$2b$10$m1E5lmmd9ZjKwJU4P.85YeqpOztS66XpsnOCGiZor48raZXeCtf5q", "Mario", "Collins");
+
+INSERT INTO RSO (UNI_ID, Admins_ID, Name, Description) VALUES (1, 4, "American College of Healthcare Executives", "The mission of the American College of Healthcare Executives at UCF is to support students to achieve their professional goals related to Healthcare Executive positions and being the official intermediaries between ACHE nationwide and UCF.");
+INSERT INTO RSO (UNI_ID, Admins_ID, Name, Description) VALUES (1, 4, "Army Reserve Officer Training Corps", "UCF Army ROTC is dedicated to educating, developing, inspiring, and recruiting aspiring Cadets. We provide leadership, career progression, and interpersonal tact in a developmental environment. Our mission is to produce US Army Commissioned Officers. ");
+INSERT INTO RSO (UNI_ID, Admins_ID, Name, Description) VALUES (1, 4, "Association of Latino Professionals for America", "The Association of Latino Professionals For America at the University of Central Florida (ALPFA UCF) is a professional development organization that seeks to build and grow the next generation of leaders and professionals.");
+INSERT INTO RSO (UNI_ID, Admins_ID, Name, Description) VALUES (1, 4, "Entrepreneurship Club", "The purpose of the club is to foster interest in entrepreneurship. We're focused on building a community of entrepreneurs along with providing valuable resources such as workshops, speaker series,
+and networking events.");
+INSERT INTO RSO (UNI_ID, Admins_ID, Name, Description) VALUES (1, 4, "Financial Knights Association", "The Financial Knights Association recognizes academic excellence among finance majors, offering mentoring and professional opportunities with a focus on high finance careers, particularly through exposure to Wall Street firms.");

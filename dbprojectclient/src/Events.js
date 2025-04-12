@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 // ----- Create Public Event -----
 function CreatePublicEvent() {
   const [formData, setFormData] = useState({});
+  const nav = useNavigate();
 
   const updateValues = (e) => {
     const { name, value } = e.target;
@@ -19,6 +20,8 @@ function CreatePublicEvent() {
       method: "post",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
+    }).then(_ => {
+      nav("/pubevs");
     });
   };
 
@@ -61,6 +64,7 @@ function CreatePublicEvent() {
 // ----- Create Private Event -----
 function CreatePrivateEvent() {
   const [formData, setFormData] = useState({});
+  const nav = useNavigate();
 
   const updateValues = (e) => {
     const { name, value } = e.target;
@@ -76,6 +80,8 @@ function CreatePrivateEvent() {
       method: "post",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
+    }).then(_ => {
+      nav("/privevs");
     });
   };
 
@@ -119,6 +125,7 @@ function CreatePrivateEvent() {
 function CreateRSOEvent() {
   const [formData, setFormData] = useState({});
   const [RSOs, setRSOs] = useState([]);
+  const nav = useNavigate();
 
   useEffect(() => {
     fetch("/api/getCurrentRSOs")
@@ -145,6 +152,8 @@ function CreateRSOEvent() {
       method: "post",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
+    }).then(_ => {
+      nav("/rsoevs");
     });
   };
 
@@ -191,8 +200,90 @@ function CreateRSOEvent() {
   );
 }
 
+function CommentInputForm({ evid, commentPostedHandler }) {
+  const [formData, setFormData] = useState({});
+  const postComment = (e) => {
+    e.preventDefault();
+
+    fetch("/api/postComment", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ...formData,
+        Event_ID: evid
+      })
+    }).then(_ => {
+      commentPostedHandler();
+    });
+  };
+
+  const updateForm = (e) => {
+    e.preventDefault();
+
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  return (
+    <form onSubmit={postComment}>
+      <label>Comment</label>
+      <input type="text" value={formData.comment} onChange={updateForm} name="comment" id="comment" /><br />
+
+      <label>Rating (out of 5)</label>
+      <input type="number" max="5" value={formData.rating} onChange={updateForm} name="rating" id="rating" /><br />
+
+      <input type="submit" value="Post Comment" />
+    </form>
+  );
+}
+
+function Comment() {
+  return (
+    <p>Comment</p>
+  );
+}
+
 // ----- Event Card -----
 function Event({ ev }) {
+  const [commentBox, setCommentBox] = useState(false);
+  const [comments, setComments] = useState([]);
+
+  useEffect(_ => {
+    fetch("/api/getComments", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        Event_ID: ev.Event_ID
+      })
+    }).then(data => data.json()).then(json => {
+      console.log(json);
+      setComments(json.comments);
+    });
+  }, []);
+
+  const commentPostedHandler = _ => {
+    setCommentBox(false);
+
+    fetch("/api/getComments", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        Event_ID: ev.Event_ID
+      })
+    }).then(data => data.json()).then(json => {
+      setComments(json.comments);
+    });
+  };
+
   return (
     <li className="event-card">
       <h3>{ev.Event_name}</h3>
@@ -203,6 +294,21 @@ function Event({ ev }) {
       <p><strong>Phone:</strong> {ev.Contact_Phone}</p>
       <p><strong>Email:</strong> {ev.Contact_Email}</p>
       <p><strong>Address:</strong> {ev.Address}</p>
+      {!commentBox &&
+        <>
+          <input className="login-join-btn" type="button" value="Write a Comment" onClick={_ => { setCommentBox(true) }} />
+          <ul style={{ listStyleType: "none", padding: "0px", paddingTop: "15px" }}>
+            {
+              comments.map((val, idx) => (
+                <li key={idx}>{val.username}: {val.Comment_text}<br />Rating: {val.Comment_rating}/5</li>
+              ))
+            }
+          </ul>
+        </>
+      }
+      {commentBox &&
+        <CommentInputForm evid={ev.Event_ID} commentPostedHandler={commentPostedHandler} />
+      }
     </li>
   );
 }
@@ -221,6 +327,7 @@ function PublicEvents() {
   return (
     <div className="page-container">
       <h2>Public Events</h2>
+      <button className="login-join-btn" onClick={() => nav("/dashboard")}>Dashboard</button>
       <button className="login-join-btn" onClick={() => nav("/create/publicEv")}>Create Public Event</button>
       <ul className="event-list">
         {events.map((ev, idx) => <Event key={idx} ev={ev} />)}
@@ -243,6 +350,7 @@ function PrivateEvents() {
   return (
     <div className="page-container">
       <h2>Private Events</h2>
+      <button className="login-join-btn" onClick={() => nav("/dashboard")}>Dashboard</button>
       <button className="login-join-btn" onClick={() => nav("/create/privateEv")}>Create Private Event</button>
       <ul className="event-list">
         {events.map((ev, idx) => <Event key={idx} ev={ev} />)}
@@ -265,6 +373,7 @@ function RSOEvents() {
   return (
     <div className="page-container">
       <h2>RSO Events</h2>
+      <button className="login-join-btn" onClick={() => nav("/dashboard")}>Dashboard</button>
       <button className="login-join-btn" onClick={() => nav("/create/rsoEv")}>Create RSO Event</button>
       <ul className="event-list">
         {events.map((ev, idx) => <Event key={idx} ev={ev} />)}
